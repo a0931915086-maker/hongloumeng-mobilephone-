@@ -1066,3 +1066,73 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navMenu = document.getElementById('nav-menu-list');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    if (menuBtn && navMenu) {
+        // 点击汉堡图标展开/收起
+        menuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            navMenu.classList.toggle('active');
+            // 切换图标：由三杠变叉号
+            const icon = menuBtn.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // 点击页面其他位置收起菜单
+        document.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            const icon = menuBtn.querySelector('i');
+            icon.classList.add('fa-bars');
+            icon.classList.remove('fa-times');
+        });
+
+        // 点击具体的导航链接后自动收起
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                const icon = menuBtn.querySelector('i');
+                icon.classList.add('fa-bars');
+                icon.classList.remove('fa-times');
+            });
+        });
+    }
+});
+
+// 在 DOMContentLoaded 内部添加
+function setupSearch() {
+    const desktopInput = document.getElementById('global-search');
+    const mobileInput = document.getElementById('global-search-mobile');
+    const searchBtns = document.querySelectorAll('.search-btn-action');
+
+    // 统一执行搜索的函数
+    const doSearch = (query) => {
+        if (!query) return;
+        // 调用你原来的搜索逻辑
+        console.log("执行搜索:", query);
+        // 这里直接复用你原来的 performSearch 逻辑，只需把 query 传进去
+    };
+
+    // 绑定回车事件
+    [desktopInput, mobileInput].forEach(input => {
+        if(!input) return;
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doSearch(input.value);
+        });
+    });
+
+    // 绑定按钮点击
+    searchBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = window.innerWidth > 768 ? desktopInput.value : mobileInput.value;
+            doSearch(val);
+        });
+    });
+}
+
+// 确保在数据加载完成后调用
+setupSearch();
