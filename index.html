@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红楼梦知识图谱 - 古典文学研究平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="hlm-layout-container"> <!-- 1. 新增此行 -->
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-book"></i>
+                <span>红楼梦知识图谱</span>
+            </div>
+            <!-- 移动端菜单按钮 -->
+            <div class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> 首页</a></li>
+                <li><a href="#characters" class="nav-link"><i class="fas fa-users"></i> 人物图谱</a></li>
+                <li><a href="#timeline" class="nav-link"><i class="fas fa-stream"></i> 情节年表</a></li>
+                <li><a href="#events" class="nav-link"><i class="fas fa-calendar-alt"></i> 重要事件</a></li>
+                <li><a href="#index" class="nav-link"><i class="fas fa-search"></i> 分类索引</a></li>
+            </ul>
+            <div class="nav-search">
+                <input type="text" id="global-search" placeholder="搜索...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-container">
+        <!-- 首页 -->
+        <section id="home" class="page-section active">
+            <div class="hero">
+                <h1>《红楼梦》知识图谱</h1>
+                <p class="subtitle">红楼梦全面数据可视化分析平台</p>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+                    <div class="stat-content">
+                        <h3>人物数量</h3>
+                        <p class="stat-number" id="character-count">0</p>
+                        <p class="stat-desc">金陵十二钗及相关人物</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-link"></i></div>
+                    <div class="stat-content">
+                        <h3>关系数量</h3>
+                        <p class="stat-number" id="relationship-count">0</p>
+                        <p class="stat-desc">血缘、姻亲、主仆等关系</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                    <div class="stat-content">
+                        <h3>时间跨度</h3>
+                        <p class="stat-number">15年</p>
+                        <p class="stat-desc">小说内时间线索</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-content">
+                        <h3>章节数量</h3>
+                        <p class="stat-number">120回</p>
+                        <p class="stat-desc">前80回/后40回</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-links">
+                <h2><i class="fas fa-external-link-alt"></i> 快速访问</h2>
+                <div class="link-grid">
+                    <a href="#characters" class="link-card">
+                        <i class="fas fa-project-diagram"></i>
+                        <h3>人物关系图谱</h3>
+                        <p>可视化探索贾府人物关系</p>
+                    </a>
+                    <a href="#timeline" class="link-card">
+                        <i class="fas fa-timeline"></i>
+                        <h3>情节时间轴</h3>
+                        <p>按时间顺序浏览全书事件</p>
+                    </a>
+                    <a href="#events" class="link-card">
+                        <i class="fas fa-star"></i>
+                        <h3>重要事件表</h3>
+                        <p>关键情节与人物命运转折</p>
+                    </a>
+                    <a href="#index" class="link-card">
+                        <i class="fas fa-sitemap"></i>
+                        <h3>分类索引</h3>
+                        <p>人物、器物、诗词、俗语</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 人物图谱 -->
+        <section id="characters" class="page-section">
+            <div class="section-header">
+                <h2><i class="fas fa-project-diagram"></i> 人物关系图谱</h2>
+                <div class="section-controls">
+                    <div class="filter-group">
+                        <select id="relation-filter">
+                            <option value="all">所有关系</option>
+                            <option value="blood">血缘关系</option>
+                            <option value="marriage">姻亲关系</option>
+                            <option value="master-servant">主仆关系</option>
+                            <option value="emotional">情感关系</option>
+                        </select>
+                        <select id="family-filter">
+                            <option value="all">所有家族</option>
+                            <option value="jia">贾府</option>
+                            <option value="wang">王家</option>
+                            <option value="shi">史家</option>
+                            <option value="xue">薛家</option>
+                        </select>
+                    </div>
+                    <button id="reset-view" class="btn-secondary">重置视图</button>
+                </div>
+            </div>
+            
+            <div class="content-grid">
+                <div class="graph-container">
+                    <div id="relationship-graph"></div>
+                </div>
+                <div class="detail-panel">
+                    <div class="detail-header">
+                        <h3>人物详情</h3>
+                        <span class="hint">点击图中节点查看详情</span>
+                    </div>
+                    <div id="character-detail" class="detail-content">
+                        <div class="empty-state">
+                            <i class="fas fa-user"></i>
+                            <p>点击人物节点查看详细信息</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 时间轴 -->
+        <section id="timeline" class="page-section">
+            <div class="section-header">
+                <h2><i class="fas fa-timeline"></i> 红楼梦情节年表</h2>
+                <div class="timeline-controls">
+                    <button id="zoom-in" class="btn-icon"><i class="fas fa-search-plus"></i></button>
+                    <button id="zoom-out" class="btn-icon"><i class="fas fa-search-minus"></i></button>
+                    <button id="fit-timeline" class="btn-secondary">适应窗口</button>
+                </div>
+            </div>
+            <div id="timeline-container"></div>
+        </section>
+
+        <!-- 重要事件 -->
+        <section id="events" class="page-section">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-alt"></i> 重要事件表</h2>
+                <div class="event-filters">
+                    <input type="text" id="event-search" placeholder="搜索事件...">
+                    <select id="event-category">
+                        <option value="all">所有分类</option>
+                        <option value="family">家族兴衰</option>
+                        <option value="love">情感主线</option>
+                        <option value="fate">命运转折</option>
+                        <option value="social">社会事件</option>
+                    </select>
+                </div>
+            </div>
+            <div id="events-container" class="events-grid">
+                <!-- 事件卡片将通过JS动态生成 -->
+            </div>
+        </section>
+
+        <!-- 分类索引 -->
+        <section id="index" class="page-section">
+            <div class="section-header">
+                <h2><i class="fas fa-sitemap"></i> 分类索引</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="persons">人物索引</button>
+                    <button class="tab-btn" data-tab="items">器物索引</button>
+                    <button class="tab-btn" data-tab="festivals">节日索引</button>
+                    <button class="tab-btn" data-tab="poems">诗词索引</button>
+                    <button class="tab-btn" data-tab="proverbs">俗语索引</button>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <!-- 人物索引 -->
+                <div id="persons-tab" class="tab-pane active">
+                    <div class="index-grid">
+                        <!-- 通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 其他索引标签页 -->
+                <div id="items-tab" class="tab-pane">
+                    <div class="index-grid"></div>
+                </div>
+                <div id="festivals-tab" class="tab-pane">
+                    <div class="index-grid"></div>
+                </div>
+                <div id="poems-tab" class="tab-pane">
+                    <div class="index-grid"></div>
+                </div>
+                <div id="proverbs-tab" class="tab-pane">
+                    <div class="index-grid"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-book"></i> 红楼梦知识图谱</h4>
+                <p>红楼梦全面数据可视化分析平台</p>
+            </div>
+            <div class="footer-section">
+                <h4>数据来源</h4>
+                <p>《<红楼梦>脂评汇校本》浙江出版社</p>
+                <p>《红楼梦》人民文学出版社</p>
+                <p>《红楼梦》三秦出版社</p>
+                <p>周汝昌《泣血红楼：曹雪芹传》</p>
+            </div>
+            <div class="footer-section">
+                <h4>技术栈</h4>
+                <p>D3.js · Vis.js · JavaScript</p>
+                <p>HTML5 · CSS3 · JSON</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>2026 红楼梦知识图谱 © 陈灵梓 · 仅供学术研究使用</p>
+        </div>
+    </footer>
+    </div> <!-- 2. 在页脚后面闭合此行 -->
+     
+    <!-- 模态框 -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">详细信息</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- 智能问答 -->
+<script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
+<script>
+  new CozeWebSDK.WebChatClient({
+    config: {
+      bot_id: '7635506135771987978',
+    },
+    componentProps: {
+      title: 'Coze',
+    },
+    auth: {
+      type: 'token',
+      token: 'pat_x0AP7xqPHWVVsUGdG9cHNhw1mtxwV0hz8oSzcOXixRDzo18ffQSMxYWW3uTdWyDW',
+      onRefreshToken: function () {
+        return 'pat_x0AP7xqPHWVVsUGdG9cHNhw1mtxwV0hz8oSzcOXixRDzo18ffQSMxYWW3uTdWyDW'
+      }
+    }
+  });
+</script>
+
+    <script src="script.js"></script>
+</body>
+</html>
